@@ -175,7 +175,7 @@ As climate risks intensify — including rising sea levels, heatwaves, and shift
 | Poor Adaptation / Planning | 0.5% of $19B potential damages          | $95,000,000  |
 | Inefficient Use of Funds   | 1.5% of $100M annual budget             | $1,500,000   |
 | Lost Educational Value     | 5,000 students × $50/student            | $250,000     |
-| **Total Estimated Cost**   |                                        | **$97.55 million** |
+| **Total Annual Cost**      |                                        | **$97.55 million** |
 
 ---
 
