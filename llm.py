@@ -122,7 +122,7 @@ class ClimateAPI:
         
         # Remove None values from params
         params_dict = {k: v for k, v in params_dict.items() if v is not None}
-                  
+                   
         res = requests.get(url, params_dict, headers=self.header)         
         res.raise_for_status()         
         print(f"Constructed API request URL: {res.url}")                  
@@ -247,6 +247,245 @@ prompt_process_agent = Agent(
             'temperature': 0.0,
             'api_key':json.load(open("tokens.json"))["gemini_api_key"]}    
     )
+
+
+def pull_data(params):
+    raster_timeseries_ep = "/raster/timeseries"
+    api_base_url = 'https://api.hcdp.ikewai.org'
+    raster_timeseries_ep = '/raster/timeseries'
+    url = f"{api_base_url}{raster_timeseries_ep}"
+
+    params = dict(params)
+    res = requests.get(url, params, headers = header)
+    res.raise_for_status()
+    # print(f"Constructed API request URL: {res.url}")
+    data = res.json()
+    
+    return data
+
+
+def plot_bar_graph(comparison_results: Dict[str, Any], title: str = "Climate Data Comparison", output_dir: str = "./output_files") -> None:
+    """
+    Creates a bar graph to visualize the comparison results from climate data and saves it as an HTML file.
+    
+    Args:
+        comparison_results (Dict[str, Any]): Dictionary containing comparison results from compare_climate_data
+        title (str): Title for the bar graph
+        output_dir (str): Directory where the HTML file will be saved (default: current directory)
+        
+    Returns:
+        None: Saves the plot as HTML and returns the figure object
+    """# Make sure you have this installed: pip install mpld3
+    
+    # Extract parameters and values from results
+    parameters = list(comparison_results.keys())
+    values = list(comparison_results.values())
+    
+    # Set up the figure and axis
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Create the bar chart
+    bar_positions = np.arange(len(parameters))
+    bars = ax.bar(bar_positions, values, width=0.6)
+    
+    # Add parameter labels
+    ax.set_xticks(bar_positions)
+    ax.set_xticklabels(parameters, rotation=45, ha='right')
+    
+    # Add value labels on top of each bar
+    for bar in bars:
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height + 0.01,
+                f'{height:.2f}', ha='center', va='bottom')
+    
+    # Set title and labels
+    ax.set_title(title)
+    ax.set_ylabel('Value')
+    parameter_desc = {
+        'ignition_probability': 'Probability (0-1)',
+        'temperature': 'Temperature (°C)',
+        'rainfall': 'Rainfall (mm)',
+        'relative_humidity': 'Relative Humidity (%)',
+        'ndvi': 'NDVI Value'
+    }
+    
+    # Add a second y-axis label with parameter descriptions if applicable
+    descriptions = []
+    for param in parameters:
+        if param in parameter_desc:
+            descriptions.append(parameter_desc[param])
+    
+    if descriptions:
+        description_text = '\n'.join(f"• {param}: {desc}" for param, desc in zip(parameters, descriptions))
+        plt.figtext(0.01, 0.01, f"Parameters:\n{description_text}", fontsize=8)
+    
+    # Format the plot
+    plt.tight_layout()
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    
+    # Add colorful bars with different colors for different parameters
+    colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6']
+    for i, bar in enumerate(bars):
+        bar.set_color(colors[i % len(colors)])
+    
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Save the plot as an HTML file
+    # html_file_path = os.path.join(output_dir, "bar_graph.html")
+    html_content = mpld3.fig_to_html(fig)
+    
+    with open(f"{output_dir}/ndvis.html", "w") as f:
+        f.write(html_content)
+    
+    # Return the figure for further use if needed
+    return fig
+
+@prompt_process_agent.tool_plain 
+def compare_climate_data(
+    lat: float,     
+    lng: float,
+    compare_ignition_probability: bool = False,
+    compare_temperature: bool = False,
+    compare_rainfall: bool = False,
+    compare_relative_humidity: bool = False,
+    compare_ndvi: bool = False,
+    aggregation: Optional[Aggregation] = Aggregation.MEAN,
+    start_date: Optional[str] = None,      
+    end_date: Optional[str] = None,
+    # production: Production = Production.NEW,
+    extent: Optional[Extent] = Extent.STATEWIDE
+) -> Dict[str, Any]:
+    """
+    Tool to compare different climate data parameters.
+    
+    Args:
+        lat (float): Latitude coordinate
+        lng (float): Longitude coordinate
+        compare_ignition_probability (bool): Whether to compare ignition probability data
+        compare_temperature (bool): Whether to compare temperature data
+        compare_rainfall (bool): Whether to compare rainfall data
+        compare_relative_humidity (bool): Whether to compare relative humidity data
+        compare_ndvi (bool): Whether to compare NDVI (Normalized Difference Vegetation Index) data
+        aggregation (Optional[Aggregation]): Method to aggregate data (default: MEAN)
+        start_date (Optional[str]): Start date for data range (format: YYYY-MM-DD)
+        end_date (Optional[str]): End date for data range (format: YYYY-MM-DD)
+        extent (Optional[Extent]): Geographical extent for data (default: STATEWIDE)
+        
+    Returns:
+        Dict[str, Any]: Dictionary containing comparison results for the selected parameters
+    """
+    api = ClimateAPI(api_base_url=api_base_url, header=header)  
+    today = datetime.now(pytz.timezone("US/Hawaii"))     
+    yesterday = today - timedelta(days=1)     
+    previous_year = today - relativedelta(years=1)          
+
+    start_str = start_date if start_date else previous_year.strftime("%Y-%m-%d")     
+    end_str = end_date if end_date else yesterday.strftime("%Y-%m-%d")
+    
+    results = {}
+    
+    if compare_ignition_probability:
+        params = ClimateDataParams(         
+        datatype="ignition_probability",         
+        # production="new",         
+        period="day", 
+        start = start_str,
+        end = end_str,
+        extent=extent,    
+        lat=lat,         
+        lng=lng     
+    )  
+        
+        ignition_data = pull_data(params)
+        if aggregation == "mean":
+            results["ignition_probability"] = np.mean(list(ignition_data.values()))
+        elif aggregation == "min":
+            results["ignition_probability"] = np.min(list(ignition_data.values()))
+        elif aggregation == "max":
+            results["ignition_probability"] = np.max(list(ignition_data.values()))        
+        
+    if compare_temperature:
+        params = ClimateDataParams(         
+        datatype="temperature",         
+        aggregation=aggregation,         
+        period="day", 
+        start = start_str,
+        end = end_str,
+        extent=extent,    
+        lat=lat,         
+        lng=lng     
+    )  
+        temperature_data = pull_data(params)
+        if aggregation == "mean":
+            results["temperature"] = np.mean(list(temperature_data.values()))
+        elif aggregation == "min":
+            results["temperature"] = np.min(list(temperature_data.values()))
+        elif aggregation == "max":
+            results["temperature"] = np.max(list(temperature_data.values()))
+        
+    if compare_rainfall:
+        params = ClimateDataParams(         
+        datatype="rainfall",         
+        production="new",         
+        period="day", 
+        start = start_str,
+        end = end_str,
+        extent=extent,    
+        lat=lat,         
+        lng=lng     
+    )  
+        rainfall_data = pull_data(params)
+        if aggregation == "mean":
+            results["rainfall"] = np.mean(list(rainfall_data.values()))
+        elif aggregation == "min":
+            results["rainfall"] = np.min(list(rainfall_data.values()))
+        elif aggregation == "max":
+            results["rainfall"] = np.max(list(rainfall_data.values()))
+        
+    if compare_relative_humidity:
+        params = ClimateDataParams(         
+        datatype="relative_humidity",         
+        # production="new",         
+        period="day", 
+        start = start_str,
+        end = end_str,
+        extent=extent,    
+        lat=lat,         
+        lng=lng     
+    )  
+        relative_humidity_data = pull_data(params)
+        if aggregation == "mean":
+            results["relative_humidity"] = np.mean(list(relative_humidity_data.values()))
+        elif aggregation == "min":
+            results["relative_humidity"] = np.min(list(relative_humidity_data.values()))
+        elif aggregation == "max":
+            results["relative_humidity"] = np.max(list(relative_humidity_data.values()))
+        
+        
+    if compare_ndvi:
+        params = ClimateDataParams(         
+        datatype="ndvi_modis",         
+        # production="new",         
+        period="day", 
+        start = start_str,
+        end = end_str,
+        extent=extent,    
+        lat=lat,         
+        lng=lng     
+    )  
+        ndvi_data = pull_data(params)
+        
+        if aggregation == "mean":
+            results["ndvi"] = np.mean(list(ndvi_data.values()))
+        elif aggregation == "min":
+            results["ndvi"] = np.min(list(ndvi_data.values()))
+        elif aggregation == "max":
+            results["ndvi"] = np.max(list(ndvi_data.values()))
+    
+    
+    plot_bar_graph(results)
+    return results
 
 
 @prompt_process_agent.tool_plain  
