@@ -160,7 +160,7 @@ As climate risks intensify — including rising sea levels, heatwaves, and shift
 
 #### Economic Cost of the Problem
 
-- **Sea level rise alone** threatens over **$19 billion** in property value statewide.
+- **Sea level rise alone** threatens over **$19 billion** in property value statewide (UH News, 2018).
 - Poor access to data hinders climate adaptation, increasing future costs of recovery and health impacts.
 - Delayed action reduces effectiveness of investments in resilience.
 - Researchers and students lose hundreds of hours navigating complex portals.
@@ -222,8 +222,8 @@ Unlike generic AI tools, our **Kani climate data concierge** chatbot:
 ## Economic Impact of Our Solution
 
 Our solution provides measurable economic value across four key areas:
-- **Productivity gains:** Saves hours per user for researchers and students
-- **Climate risk reduction:** Enables early action and reduces damages
+- **Productivity gains:** Saves 10 hours per user for researchers and students
+- **Climate risk reduction:** Enables early action and reduces 0.1% damages
 - **Smarter public planning:** Helps prioritize investments using trusted data
 - **Education:** Improves climate literacy and data skills
 
