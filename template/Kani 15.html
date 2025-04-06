@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Messenger Style Chatbot with Voice Reply</title>
+  <link rel="icon" href="/static/Kani.jpg" type="image/x-icon" />
+  <style>
+    /* Reset margins and paddings */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      background: #f0f0f0;
+    }
+    .messenger-container {
+      display: flex;
+      flex-direction: column;
+      height: 80vh;
+      width: 500px;
+      margin: 20px auto;
+      background: white;
+      border-left: 2px solid #ccc;
+      border-right: 2px solid #ccc;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 15px; /* Rounded corners added */
+    }
+    .chat-header {
+      background: #0084FF;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      flex-shrink: 0;
+      border-top-left-radius: 15px; /* Match container's rounded corners */
+      border-top-right-radius: 15px;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: white;
+    }
+    .message.bot {
+      background: #ffffff;
+      align-self: flex-start;
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px;
+      max-width: 80%;
+    }
+    .bot-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .bot-text {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .message.user {
+      background: #0084FF;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 15px;
+      border-bottom-left-radius: 15px;
+      padding: 10px 14px;
+      max-width: 70%;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .chat-input {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: white;
+      border-top: 1px solid #ddd;
+      flex-shrink: 0;
+      gap: 8px;
+      border-bottom-left-radius: 15px; /* Match container's rounded corners */
+      border-bottom-right-radius: 15px;
+    }
+    .chat-input input[type="text"] {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      outline: none;
+    }
+    .chat-input button {
+      background: #0084FF;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="messenger-container">
+    <div class="chat-header">Kani Chatbot</div>
+    <div class="chat-messages" id="chat">
+      <div class="message bot">
+        <img class="bot-avatar" src="/static/Kani.jpg" alt="Bot Avatar">
+        <span class="bot-text">Hi! How can I help you today?</span>
+      </div>
+    </div>
+    <div class="chat-input">
+      <!-- Voice input button with microphone image -->
+      <button onclick="startVoiceRecognition()">
+        <img src="/static/microphone.png" alt="Voice" style="width:24px; height:24px;">
+      </button>
+      <!-- Text input for messages -->
+      <input type="text" id="user-input" placeholder="Type a message..." />
+      <!-- Send button -->
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+  <script> 
+    async function sendMessage() {
+      const input = document.getElementById("user-input");
+      const chat = document.getElementById("chat");
+      const userMessage = input.value.trim();
+      if (userMessage === "") return;
+
+      // Append the user's message to the chat window.
+      const userBubble = document.createElement("div");
+      userBubble.className = "message user";
+      userBubble.textContent = userMessage;
+      chat.appendChild(userBubble);
+      chat.scrollTop = chat.scrollHeight;
+      input.value = "";
+
+      // Create a temporary "Typing..." bubble for the bot.
+      const botBubble = document.createElement("div");
+      botBubble.className = "message bot";
+      const avatar = document.createElement("img");
+      avatar.src = "/static/Kani.jpg";
+      avatar.alt = "Bot Avatar";
+      avatar.className = "bot-avatar";
+      botBubble.appendChild(avatar);
+      const botText = document.createElement("span");
+      botText.className = "bot-text";
+      botText.textContent = "Typing...";
+      botBubble.appendChild(botText);
+      chat.appendChild(botBubble);
+      chat.scrollTop = chat.scrollHeight;
+
+      try {
+        // Send a POST request to the /message endpoint.
+        const response = await fetch("/message", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: userMessage })
+        });
+        const data = await response.json();
+        console.log("Response:", data);
+        // Update the bot's bubble with the received message, rendering HTML.
+        botText.innerHTML = data.message;
+      } catch (error) {
+        console.error("Error sending message:", error);
+        botText.innerHTML = "Sorry, something went wrong.";
+      }
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    // Voice recognition using the Web Speech API.
+    function startVoiceRecognition() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("Sorry, your browser doesn't support speech recognition.");
+        return;
+      }
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("user-input").value = transcript;
+        // Automatically send the message after voice recognition.
+        sendMessage();
+      };
+      
+      recognition.onerror = function(event) {
+        console.error("Speech recognition error:", event.error);
+        alert("Error during voice recognition: " + event.error);
+      };
+      
+      recognition.start();
+    }
+    
+    // Send messages on Enter key press.
+    document.getElementById("user-input").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
