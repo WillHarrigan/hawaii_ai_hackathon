@@ -171,26 +171,111 @@ mkcert localhost
 ```
 
 ---
-## Usage
-1. Access the Chat Interface:
->Open your browser and navigate to the URL where the application is running. You will see the Kani Chatbot interface.
+## User Needs and Economic Impact Report
 
-2. Interacting with the Chatbot:
->Text Input: Type your message in the input field and press "Enter" or click the "Send" button.
+### Problem Statement
 
->Voice Input: Click the microphone icon to activate voice recognition. The spoken words will be converted into text and sent as a message.
+Despite the abundance of publicly available climate data for Hawaiʻi, residents, students, researchers, and decision-makers struggle to access and interpret it effectively.
 
->Chat Responses:The chatbot processes your message and responds. The voice reply feature will read out the chatbot's response if enabled.
+#### Current Platforms Are Often:
+- Overly technical or fragmented
+- Difficult to navigate for non-experts
+- Lacking intuitive visualizations or summaries
+- Not designed for conversational access or personalized insights
+
+As climate risks intensify — including rising sea levels, heatwaves, and shifting rainfall patterns — there is an urgent need to make climate information more accessible, trustworthy, and actionable for the broader public.
+
+#### Economic Cost of the Problem
+
+- **Sea level rise alone** threatens over **$19 billion** in property value statewide.
+- Poor access to data hinders climate adaptation, increasing future costs of recovery and health impacts.
+- Delayed action reduces effectiveness of investments in resilience.
+- Researchers and students lose hundreds of hours navigating complex portals.
+
+**Even a 1% improvement** in climate decision-making could save **tens of millions** across sectors.
+
+#### Estimated Cost of the Problem (Annual)
+
+| Problem Area               | Users / Basis                          | Cost         |
+| -------------------------- | -------------------------------------- | ------------ |
+| Wasted Productivity        | 2,000 users × 10 hours × $40/hr         | $800,000     |
+| Poor Adaptation / Planning | 0.5% of $19B potential damages          | $95,000,000  |
+| Inefficient Use of Funds   | 1.5% of $100M annual budget             | $1,500,000   |
+| Lost Educational Value     | 5,000 students × $50/student            | $250,000     |
+| **Total Estimated Cost**   |                                        | **$97.55 million** |
 
 ---
 
-## Customization
+## Survey
 
-1. Styling:
->Modify static/style.css to adjust the appearance of the chat interface.
+To ensure our solution meets real needs, we conducted a targeted user survey with 22 potential users across Hawaiʻi — including residents, students, researchers, educators, and policy influencers. You can find our survey questions at:  
+[Survey Link](https://docs.google.com/forms/d/e/1FAIpQLSclJClgc3AUjlcIWB2BaTx89NYxv8ABRIb4YwqJmZbt4FLwqA/viewform)
 
-2. Frontend Behavior:
->Update static/script.js to change the functionality or behavior of chat interactions and voice features.
+#### Key Findings:
+- **89%** of respondents said they are likely or very likely to use an AI chatbot to explore Hawaiʻi climate data.
+- Currently, most people look for climate data by using data portals or Google Search and they have the following common challenges:
+  - Too much technical jargon
+  - Difficulty finding the right dataset
+  - Hard-to-navigate websites
+- Users expressed a strong need for:
+  - Data and answers based on trusted sources
+  - Time series visualizations and downloadable data
+  - Natural, easy-to-use conversational interface
 
-3. Backend Logic:
->Customize llm.py to change how messages are processed or integrate additional functionalities.
+Our potential users want a smarter, simpler, and more human way to engage with Hawaiʻi’s climate data. Our solution does not only solve a validated problem but also co-creates value with the people we want to serve.
+
+---
+
+## Our Solution
+
+We are building an **AI-powered chatbot** designed to act as a **Climate Concierge** for Hawaiʻi, enabling users to:
+
+- Easily ask questions about climate conditions, risks, and trends across the Hawaiian Islands
+- Receive trustworthy responses backed by data from the Hawaiʻi Climate Data Portal
+- Visualize trends in temperature, rainfall, and sea level rise with charts
+- Get personalized insights and explanations based on their needs and level of expertise
+
+#### Unique Value of Our Solution
+
+Unlike generic AI tools, our **Kani climate data concierge** chatbot:
+- Offers local relevance, verified data, and user-centered insights
+- Is trained on local datasets like the Hawaiʻi Climate Data Portal (HCDP)
+- Supports policy responses, student learning, and community decision-making
+
+---
+
+## Economic Impact of Our Solution
+
+Our solution provides measurable economic value across four key areas:
+- **Productivity gains:** Saves hours per user for researchers and students
+- **Climate risk reduction:** Enables early action and reduces damages
+- **Smarter public planning:** Helps prioritize investments using trusted data
+- **Education:** Improves climate literacy and data skills
+
+#### Estimated Economic Impact (Annually)
+
+| Impact Area              | Details                                   | Estimated Value    |
+| ------------------------ | ----------------------------------------- | ------------------ |
+| Productivity Gains       | 2,000 users × 10 hours × $40/hr            | $800,000           |
+| Climate Risk Reduction   | 0.1% of $19B potential damage avoided      | $19,000,000        |
+| Smarter Policy & Planning| 1% of $50M influenced spending             | $500,000           |
+| Education & Literacy     | 5,000 students × $50/student               | $250,000           |
+| **Total Annual Impact**  |                                           | **$20.55 million** |
+
+---
+
+## Sustainability of Our Solution
+
+Our chatbot is built for long-term sustainability in both technical and financial aspects.
+
+### Technical Sustainability
+- **Continuous learning:** Integrates real-time updates from trusted sources like HCDP
+- **Modular architecture:** Scalable to new regions, platforms, and technologies
+
+### Financial Sustainability
+- **Institutional partnerships:** With UH, government, and research institutions
+- **Educational licensing:** Premium tools for schools and universities
+- **Grant and government support:** Aligns with climate resilience and public education goals
+- **Open-source core with paid services:** Consulting, analytics, and custom deployments
+
+This model ensures that our solution continues to provide value and evolve with Hawaiʻi’s needs.
