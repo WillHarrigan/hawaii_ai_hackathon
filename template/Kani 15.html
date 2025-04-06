@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Messenger Style Chatbot with Voice Reply</title>
+  <link rel="icon" href="/static/Kani.jpg" type="image/x-icon" />
+  <link rel="stylesheet" href="/static/style.css">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+  />
+</head>
+<body>
+  <div class="messenger-container">
+    <div class="chat-header">
+      <img src="/static/Kani.jpg" alt="Logo" class="logo" />
+    </div>
+    <div class="chat-messages" id="chat">
+      <div class="message bot">
+        <img class="bot-avatar" src="/static/Kani.jpg" alt="Bot Avatar">
+        <span class="bot-text">Hi! How can I help you today?</span>
+      </div>
+    </div>
+
+  <div class="chat-input">
+    <!-- Voice toggle switch -->
+    <label class="voice-toggle">
+      <input type="checkbox" id="voice-toggle">
+      <b></b>
+    </label>
+    <!-- Voice input button with microphone image -->
+    <button onclick="startVoiceRecognition()">
+      <img src="/static/microphone.png" alt="Voice" style="width:24px; height:24px;">
+    </button>
+    <!-- Text input for messages -->
+    <input type="text" id="user-input" placeholder="Type a message..." />
+    <!-- Send button -->
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
