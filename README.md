@@ -175,7 +175,7 @@ As climate risks intensify — including rising sea levels, heatwaves, and shift
 | Poor Adaptation / Planning | 0.5% of $19B potential damages          | $95,000,000  |
 | Inefficient Use of Funds   | 1.5% of $100M annual budget             | $1,500,000   |
 | Lost Educational Value     | 5,000 students × $50/student            | $250,000     |
-| **Total Estimated Cost**   |                                        | **$97.55 million** |
+| **Total Annual Cost**      |                                        | **$97.55 million** |
 
 ---
 
@@ -203,7 +203,7 @@ Our potential users want a smarter, simpler, and more human way to engage with H
 
 ## Our Solution
 
-We are building an **AI-powered chatbot** designed to act as a **Climate Concierge** for Hawaiʻi, enabling users to:
+We are building an **AI-powered chatbot** designed to act as a **Climate Concierge** for Hawaiʻi. Our target audience are residents, students, researchers, educators, and policy-influencers across Hawaii. Our chatbot enables users to:
 
 - Easily ask questions about climate conditions, risks, and trends across the Hawaiian Islands
 - Receive trustworthy responses backed by data from the Hawaiʻi Climate Data Portal
@@ -235,7 +235,7 @@ Our solution provides measurable economic value across four key areas:
 | Climate Risk Reduction   | 0.1% of $19B potential damage avoided      | $19,000,000        |
 | Smarter Policy & Planning| 1% of $50M influenced spending             | $500,000           |
 | Education & Literacy     | 5,000 students × $50/student               | $250,000           |
-| **Total Annual Impact**  |                                           | **$20.55 million** |
+| **Total Annual Positive Impact**  |                                           | **$20.55 million** |
 
 ---
 
