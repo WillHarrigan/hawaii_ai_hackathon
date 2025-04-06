@@ -2,6 +2,8 @@ from pydantic_ai import Agent
 import os
 import requests
 from datetime import datetime, timedelta
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from requests.models import PreparedRequest
@@ -9,6 +11,7 @@ from urllib.request import Request, urlopen
 import numpy as np
 from dateutil.relativedelta import relativedelta
 from typing import Optional
+import mpld3
 
 import json
 import plotly.express as px
@@ -33,6 +36,8 @@ import pandas as pd
 import plotly.express as px
 from pydantic import BaseModel
 import json
+from rasterio.io import MemoryFile
+import re
 
 
 hcdp_api_token = json.load(open("tokens.json"))["hcdp_api_token"]
@@ -82,13 +87,13 @@ class Extent(str, Enum):
     HAWAII = Big Island, Hawai'i
     KAUAI = Kauai island, Hawai'i
     HONOLULU = O'ahu island, Hawai'i
-    MAUI = Maui island
+    MLM = Moloka'i and Lanai islands, Maui island, 
     STATEWIDE = any time latitude and longitude coordinates are input, extent = statewide    
     '''
     STATEWIDE = "statewide"  # Data for the whole state
     HAWAII = "bi"            # Hawaii county
     KAUAI = "ka"             # Kauai county
-    MAUI = "mn"              # Maui county
+    MLM = "mn"              # Maui, Molokai, Lanai county
     HONOLULU = "oa"          # Honolulu county
 
 class ClimateDataParams(BaseModel):
@@ -179,15 +184,25 @@ today = datetime.now(pytz.timezone("US/Hawaii"))
 
 prompt_process_query = f"""You are a Concierge AI assistant for the Hawai'i Climate Data Portal (HCDP). Your primary role is to provide accurate, data-driven answers using the available tools.
 
-Users typically ask two types of questions:
+Users typically ask two types of queries - Specific Climate Data Queries and General Information Queries.
+Your task is to carefully classify the query into one of these two categories and respond accordingly.
+During the classification process, you should answer the following questions:
+1. What is the user exactly asking for?
+2. Does the query want a plot to be shown?
+3. Which tool should be used to answer the requirements in the query?
+
+The 2 types of queries are:
 
 1. Specific Climate Data Queries
-Queries seeking climate data (temperature or rainfall) for a specified location and time period. Use the HCDP API to fetch accurate data.
+Queries seeking climate data for a specified location and time period. Use the HCDP API to fetch accurate data.
+These types of queries may also ask for a plot, a summary of the data, of to show or display change in raster or a variable over time. 
+
 
 Examples:
 "What's the average temperature in Honolulu for last month?"
 "What was the maximum rainfall in Kauai last year?"
-"What was the minimum temperature in Manoa last week?"
+"Plot the temparature change over the last 30 days in Hilo."
+"Show the rainfall change over the last year in Honolulu."
 
 When receiving this type of query, classify it clearly and fill the following template to fetch data:
 datatype: "temperature" | "rainfall | relative_humidity | ndvi_modis | ignition_probability",
@@ -214,12 +229,12 @@ If the information is unavailable, inform the user accordingly.
 
 
 Response Format:
-Always respond clearly using concise HTML code. Format URLs in anchor tags with target="_blank". If relevant, provide a plot link:
+Always respond clearly using concise HTML code. Only if relevant, provide a plot link using anchor tags with target="_blank".:
 <p>Your concise answer here.</p>
-<a href="/plot" target="_blank">Open Plot</a> <!-- include only if relevant -->
+<a href="/plot" target="_blank">Open Plot</a> <!-- include only if user asks for a display/show/plot -->
 
 
-If a user's query isn't clear or doesn't fit these categories, politely ask for clarification.
+If a user's query isn't clear or doesn't fit these categories, politely ask to rewrite the query more clearly.
 
 """
 
@@ -410,6 +425,39 @@ def get_relative_humidity_timeseries(
      
     return result
 
+
+@prompt_process_agent.tool_plain
+def get_lat_long_from_location(location_name:str):
+    """
+    Retrieves the latitude and longitude for a given location name using the Google Geocoding API.
+    
+    Parameters:
+        api_key (str): Your Google Maps API key.
+        location_name (str): The name or address of the location.
+        
+    Returns:
+        dict: A dictionary with 'lat' and 'lng' keys if successful, or None otherwise.
+    """
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {
+        "address": location_name,
+        "key": json.load(open("tokens.json"))["gmaps_api_key"]
+    }
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()  # Raise an error for bad status codes.
+        data = response.json()
+        if data.get("status") == "OK" and data.get("results"):
+            location = data["results"][0]["geometry"]["location"]
+            return location
+        else:
+            print("Error: Could not retrieve geocode data for location:", location_name)
+            return None
+    except Exception as e:
+        print("Error retrieving geocode data:", e)
+        return None
+
+
 @prompt_process_agent.tool_plain  
 def get_vegetation_data_timeseries(     
     period: Period,     
@@ -528,6 +576,161 @@ def get_ignition_probability_timeseries(
     return result
 
 
+## Raster Rendering Code
+def display_raster(params, title, cmap=plt.cm.viridis.reversed(), nodata_color="#f0f0f0"):
+    raster_ep = "/raster"
+    url = f"{api_base_url}{raster_ep}"
+    url_constructor = PreparedRequest()
+    url_constructor.prepare_url(url, params)
+    full_url = url_constructor.url
+    print(f"Constructed API request URL: {full_url}")
+
+    req = Request(full_url, headers=header)
+
+    # Read raster data from API
+    try:
+        with urlopen(req) as raster:
+            with MemoryFile(raster.read()) as memfile:
+                with memfile.open() as dataset:
+                    data = dataset.read(1)  # Read first band
+                    nodata = dataset.nodata or data[0, 0]
+                    masked = np.ma.masked_equal(data, nodata)
+
+        # Set colormap nodata color
+        cmap.set_bad(nodata_color)
+
+        # Plot
+        fig, ax = plt.subplots(figsize=(20, 10), facecolor="#e0e0e0")
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_title(title, fontsize=20)
+        im = ax.imshow(masked, cmap=cmap)
+        fig.colorbar(im, ax=ax)
+
+        # Save interactive HTML with mpld3
+        html_str = mpld3.fig_to_html(fig)
+        with open(f"{output_dir}/ndvis.html", "w") as f:
+            f.write(html_str)
+
+    except Exception as e:
+        print(f"Error displaying raster: {e}")
+
+@prompt_process_agent.tool_plain
+def display_rainfall_raster(
+    date: str,
+    production: Production = Production.NEW,
+    extent: Extent = Extent.STATEWIDE,
+    period: Period = Period.MONTH
+) -> None:
+    """Display the rainfall raster for the given date and extent."""
+    params = {
+        "datatype": "rainfall",
+        "production": production.value,  # Use `.value` if Production is an Enum
+        "period": "month",
+        "date": date,
+        "extent": extent.value  # Use `.value` if Extent is an Enum
+    }
+
+    title = f"Rainfall Raster for {extent.value.title()} on {date}"
+    display_raster(params, title)
+    
+@prompt_process_agent.tool_plain
+def display_temperature_raster(
+    date: str,
+    aggregation: Aggregation = Aggregation.MEAN,
+    extent: Extent = Extent.STATEWIDE,
+    period: Period = Period.MONTH
+) -> None:
+    """Display the temperature raster for the given date and extent."""
+    params = {
+        "datatype": "temperature",
+        "aggregation": aggregation.value,  # Use `.value` if Production is an Enum
+        "period": "month",
+        "date": date,
+        "extent": extent.value  # Use `.value` if Extent is an Enum
+    }
+
+    title = f"Temperature ({aggregation.value.title()}) Raster for {extent.value.title()} on {date}"
+    display_raster(params, title)
+
+
+@prompt_process_agent.tool_plain
+def display_relative_humidity_raster(
+    date: str,
+    # aggregation: Aggregation = Aggregation.MEAN,
+    extent: Extent = Extent.STATEWIDE
+) -> None:
+    """Display the relative humidity raster for the given date and extent."""
+    params = {
+        "datatype": "relative_humidity",
+        # "aggregation": aggregation.value,  # Use `.value` if Production is an Enum
+        "period": "day",
+        "date": date,
+        "extent": extent.value  # Use `.value` if Extent is an Enum
+    }
+
+    title = f"Relative Humidity Raster for {extent.value.title()} on {date}"
+    display_raster(params, title)
+
+
+@prompt_process_agent.tool_plain
+def display_vegetation_cover_raster(
+    date: str,
+    # aggregation: Aggregation = Aggregation.MEAN,
+    extent: Extent = Extent.STATEWIDE
+) -> None:
+    """Display the vegetation cover NDVI raster for the given date and extent."""
+    params = {
+        "datatype": "ndvi_modis",
+        # "aggregation": aggregation.value,  # Use `.value` if Production is an Enum
+        "period": "day",
+        "date": date,
+        "extent": extent  # Use `.value` if Extent is an Enum
+    }
+
+    title = f"Normalized Difference Vegetation Index (NDVI) Raster for {extent.value.title()} on {date}"
+    display_raster(params, title)
+
+
+@prompt_process_agent.tool_plain
+def display_ignition_probability_raster(
+    date: str,
+    # aggregation: Aggregation = Aggregation.MEAN,
+    extent: Extent = Extent.STATEWIDE
+) -> None:
+    """Display the ignition probability raster for the given date and extent."""
+    params = {
+        "datatype": "ignition_probability",
+        # "aggregation": aggregation.value,  # Use `.value` if Production is an Enum
+        "period": "day",
+        "date": date,
+        "extent": extent  # Use `.value` if Extent is an Enum
+    }
+
+    title = f"Ignition Probability Raster for {extent.value.title()} on {date}"
+    display_raster(params, title)
+
+
+
+def convert_temp(sentence):
+    # Define a function to handle the replacement
+    def repl(match):
+        celsius_str = match.group(1)
+        celsius_val = float(celsius_str)
+        fahrenheit_val = celsius_val * 9/5 + 32
+        # Format the Fahrenheit conversion to 2 decimal places and include both units.
+        return f"{fahrenheit_val:.2f}°F ({celsius_str}°C)"
+    
+    # Use regex to search for a pattern matching a number (with optional decimal) followed by °C.
+    new_sentence = re.sub(r"(-?\d+(?:\.\d+)?)°C", repl, sentence)
+    return new_sentence
+
+
 async def process_query(query: str) -> str:
     r = await prompt_process_agent.run(query)
-    return r.data.replace("```html", "").strip()
+    if r.data.startswith("```html"):
+        r.data = r.data.replace("```html", "").replace("```", "")
+    if r.data.endswith("```"):
+        r.data = r.data.replace("```", "")
+    
+    return convert_temp(r.data.strip())
