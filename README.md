@@ -14,34 +14,6 @@
 
 Kani Chatbot is an interactive messenger-style chatbot solution developed as a submission for Challenge 2 in the Aloha Data AI Hackathon. This project leverages modern web technologies to create a responsive chat interface that supports both text and voice inputs. The chatbot utilizes a backend service to process user messages and generate responses—ensuring an engaging and accessible user experience.
 
----
-
-## Problem Statement 
-
-Despite the abundance of publicly available climate data for Hawaiʻi, residents, students, researchers, and decision-makers struggle to access and interpret it effectively.
-Current platforms are often:
-
-•	Overly technical or fragmented
-
-•	Difficult to navigate for non-experts
-
-•	Lacking intuitive visualizations or summaries
-
-•	Not designed for conversational access or personalized insights
-
-As climate risks intensify — including rising sea levels, heatwaves, and shifting rainfall patterns — there is an urgent need to make climate information more accessible, trustworthy, and actionable for the broader public. 
-
-Hawaiʻi faces billions in projected climate-related damages, yet limited access to understandable climate data continues to hinder informed decision-making.
-
----
-
-## Our Solution
-
-While powerful generative AI tools like ChatGPT, Gemini, Grok and LLaMA are widely available, they are not built for Hawaiʻi-specific climate data access, trust, or usability. Our Kani climate data concierge chatbot is uniquely designed to fill this critical gap by offering local relevance, verified data, and user-centered climate insights.
-
-Our chatbot is trained and fine-tuned on local dataset such as the Hawaiʻi Climate Data Portal (HCDP). Unlike generic AIs, we understand the islands' microclimates, sea level rise zones, and adaptation challenges. Each response is backed by the real data collected from HCDP, helping users validate and trust the information — a key need not fulfilled by other AIs.
-
-Our tool doesn't just provide data — it helps users visualize trends, download usable datasets, and explore community or policy responses. Unlike generic AIs, we’ve interviewed and surveyed users in Hawaiʻi to design the chatbot around their real needs, knowledge gaps, and desired use cases (e.g., students, residents, researchers).
 
 ---
 
@@ -215,7 +187,6 @@ To ensure our solution meets real needs, we conducted a targeted user survey wit
 
 
 #### Key Findings:
-- **89%** of respondents said they are likely or very likely to use an AI chatbot to explore Hawaiʻi climate data.
 - Currently, most people look for climate data by using data portals or Google Search and they have the following common challenges:
   - Too much technical jargon
   - Difficulty finding the right dataset
@@ -224,6 +195,7 @@ To ensure our solution meets real needs, we conducted a targeted user survey wit
   - Data and answers based on trusted sources
   - Time series visualizations and downloadable data
   - Natural, easy-to-use conversational interface
+- **89%** of respondents said they are likely or very likely to use an AI chatbot to explore Hawaiʻi climate data.
 
 Our potential users want a smarter, simpler, and more human way to engage with Hawaiʻi’s climate data. Our solution does not only solve a validated problem but also co-creates value with the people we want to serve.
 
