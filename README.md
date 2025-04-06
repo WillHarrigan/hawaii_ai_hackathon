@@ -235,7 +235,7 @@ Our solution provides measurable economic value across four key areas:
 | Climate Risk Reduction   | 0.1% of $19B potential damage avoided      | $19,000,000        |
 | Smarter Policy & Planning| 1% of $50M influenced spending             | $500,000           |
 | Education & Literacy     | 5,000 students × $50/student               | $250,000           |
-| **Total Annual Impact**  |                                           | **$20.55 million** |
+| **Total Annual Positive Impact**  |                                           | **$20.55 million** |
 
 ---
 
