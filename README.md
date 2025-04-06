@@ -203,7 +203,7 @@ Our potential users want a smarter, simpler, and more human way to engage with H
 
 ## Our Solution
 
-We are building an **AI-powered chatbot** designed to act as a **Climate Concierge** for Hawaiʻi, enabling users to:
+We are building an **AI-powered chatbot** designed to act as a **Climate Concierge** for Hawaiʻi. Our target audience are residents, students, researchers, educators, and policy-influencers across Hawaii. Our chatbot enables users to:
 
 - Easily ask questions about climate conditions, risks, and trends across the Hawaiian Islands
 - Receive trustworthy responses backed by data from the Hawaiʻi Climate Data Portal
