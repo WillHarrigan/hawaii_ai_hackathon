@@ -25,6 +25,27 @@ Kani Chatbot is an interactive messenger-style chatbot solution developed as a s
 - Fully modular functionality
 - Your data privacy is secured
 
+---
+
+## Handled Security concerns:
+
+* Prompt Injection Attacks:
+>Malicious users can craft inputs that manipulate the model’s behavior. By embedding hidden instructions, attackers might force the LLM to produce unintended or harmful outputs.
+
+>In our case, we don't answer anything that does not fall under either of two criteria - even when one criteria is selected, the response is driven by selective data. So injection is not possible
+
+
+* Data Leakage:
+>Since LLMs are trained on vast datasets, there's a risk they might inadvertently reveal sensitive or private information that was part of their training data, especially if prompted in specific ways.
+
+>In our case, our answers are strictly restricted by the tools that retrieve public data. So it is not possible to get personal info from our chat.
+
+
+* Adversarial Attacks:
+>Attackers can design inputs to trick the model into making errors or generating inappropriate content. These subtle, crafted inputs can lead the model to produce outputs that deviate significantly from the intended response. 
+
+>In our case, If the query can't be answered from the extracted dtaa, we refuse to answer at all preventing itself from adversarial attacks
+
 
 ---
 
