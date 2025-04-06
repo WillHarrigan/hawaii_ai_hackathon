@@ -5,7 +5,8 @@
 </div>
   
 *Solution for Challenge 2 in Aloha Data:🌈🏝️AI Hackathon for Hawaiʻi’s Resilience*  
-[Hackathon Details](https://datascience.hawaii.edu/ai-hackathon/)
+
+<a href="https://datascience.hawaii.edu/ai-hackathon/" target="_blank">Hackathon Details</a>
 
 ---
 
@@ -209,7 +210,9 @@ As climate risks intensify — including rising sea levels, heatwaves, and shift
 ## Survey
 
 To ensure our solution meets real needs, we conducted a targeted user survey with 22 potential users across Hawaiʻi — including residents, students, researchers, educators, and policy influencers. You can find our survey questions at:  
-[Survey Link](https://docs.google.com/forms/d/e/1FAIpQLSclJClgc3AUjlcIWB2BaTx89NYxv8ABRIb4YwqJmZbt4FLwqA/viewform)
+
+<a href="https://docs.google.com/forms/d/e/1FAIpQLSclJClgc3AUjlcIWB2BaTx89NYxv8ABRIb4YwqJmZbt4FLwqA/viewform" target="_blank">Survey Link</a>
+
 
 #### Key Findings:
 - **89%** of respondents said they are likely or very likely to use an AI chatbot to explore Hawaiʻi climate data.
