@@ -15,7 +15,7 @@ Kani Chatbot is an interactive messenger-style chatbot solution developed as a s
 
 ---
 
-## Problem and Solution
+## Problem Statement 
 
 Despite the abundance of publicly available climate data for Hawaiʻi, residents, students, researchers, and decision-makers struggle to access and interpret it effectively.
 Current platforms are often:
@@ -30,7 +30,11 @@ Current platforms are often:
 
 As climate risks intensify — including rising sea levels, heatwaves, and shifting rainfall patterns — there is an urgent need to make climate information more accessible, trustworthy, and actionable for the broader public. 
 
-Hawaiʻi faces billions in projected climate-related damages, yet limited access to understandable climate data continues to hinder informed decision-making which costs tens of millions dollars annually.
+Hawaiʻi faces billions in projected climate-related damages, yet limited access to understandable climate data continues to hinder informed decision-making.
+
+---
+
+## Our Solution
 
 While powerful generative AI tools like ChatGPT, Gemini, Grok and LLaMA are widely available, they are not built for Hawaiʻi-specific climate data access, trust, or usability. Our Kani climate data concierge chatbot is uniquely designed to fill this critical gap by offering local relevance, verified data, and user-centered climate insights.
 
